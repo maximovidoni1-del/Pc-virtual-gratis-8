@@ -1,0 +1,32 @@
+name: Windows 11 Virtual PC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-2025
+
+    steps:
+      - name: Mostrar información de la PC virtual
+        shell: pwsh
+        run: |
+          Write-Host "=== WINDOWS VIRTUAL ==="
+          Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsArchitecture
+          Write-Host ""
+          Write-Host "=== CPU ==="
+          Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores
+          Write-Host ""
+          Write-Host "=== RAM ==="
+          Get-CimInstance Win32_ComputerSystem |
+            Select-Object @{Name="RAM_GB";Expression={[math]::Round($_.TotalPhysicalMemory / 1GB, 2)}}
+
+      - name: Probar Windows
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path "$env:USERPROFILE\Desktop\Prueba" -Force
+          "PC virtual funcionando correctamente" |
+            Out-File "$env:USERPROFILE\Desktop\Prueba\mensaje.txt"
+
+      - name: Finalizar
+        run: echo "La máquina virtual terminó correctamente."
